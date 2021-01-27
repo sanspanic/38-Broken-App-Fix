@@ -114,6 +114,19 @@ describe("GET /users", function () {
     expect(response.statusCode).toBe(200);
     expect(response.body.users.length).toBe(3);
   });
+
+  //BUG 5 test
+  test("should only list basic info about users", async function () {
+    const response = await request(app)
+      .get("/users")
+      .send({ _token: tokens.u1 });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.users[0]).toEqual({
+      username: "u1",
+      first_name: "fn1",
+      last_name: "ln1",
+    });
+  });
 });
 
 describe("GET /users/[username]", function () {
@@ -134,6 +147,14 @@ describe("GET /users/[username]", function () {
       email: "email1",
       phone: "phone1",
     });
+  });
+
+  //BUG 6 TEST
+  test("should throw 404 if user not found", async function () {
+    const response = await request(app)
+      .get("/users/not-a-user")
+      .send({ _token: tokens.u1 });
+    expect(response.statusCode).toBe(404);
   });
 });
 
@@ -183,6 +204,7 @@ describe("PATCH /users/[username]", function () {
     });
   });
 
+  //BUG 3 test 1
   test("should disallow patching not-allowed-fields", async function () {
     const response = await request(app)
       .patch("/users/u1")
@@ -190,6 +212,7 @@ describe("PATCH /users/[username]", function () {
     expect(response.statusCode).toBe(400);
   });
 
+  //BUG 3 test 2
   test("should disallow patching fields that don't exist on db side", async function () {
     const response = await request(app)
       .patch("/users/u1")
@@ -224,6 +247,14 @@ describe("DELETE /users/[username]", function () {
       .send({ _token: tokens.u3 }); // u3 is admin
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({ message: "deleted" });
+  });
+
+  //BUG 4 test
+  test("should throw 404 if user doesn't exist", async function () {
+    const response = await request(app)
+      .delete("/users/no-such-user")
+      .send({ _token: tokens.u3 }); // u3 is admin
+    expect(response.statusCode).toBe(404);
   });
 });
 

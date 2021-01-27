@@ -1,14 +1,20 @@
-const bcrypt = require('bcrypt');
-const db = require('../db');
-const ExpressError = require('../helpers/expressError');
-const sqlForPartialUpdate = require('../helpers/partialUpdate');
+const bcrypt = require("bcrypt");
+const db = require("../db");
+const ExpressError = require("../helpers/expressError");
+const sqlForPartialUpdate = require("../helpers/partialUpdate");
 const { BCRYPT_WORK_FACTOR } = require("../config");
 
 class User {
+  /** Register user with data. Returns new user data. */
 
-/** Register user with data. Returns new user data. */
-
-  static async register({username, password, first_name, last_name, email, phone}) {
+  static async register({
+    username,
+    password,
+    first_name,
+    last_name,
+    email,
+    phone,
+  }) {
     const duplicateCheck = await db.query(
       `SELECT username 
         FROM users 
@@ -30,19 +36,11 @@ class User {
           (username, password, first_name, last_name, email, phone) 
         VALUES ($1, $2, $3, $4, $5, $6) 
         RETURNING username, password, first_name, last_name, email, phone`,
-      [
-        username,
-        hashedPassword,
-        first_name,
-        last_name,
-        email,
-        phone
-      ]
+      [username, hashedPassword, first_name, last_name, email, phone]
     );
 
     return result.rows[0];
   }
-
 
   /** Is this username + password combo correct?
    *
@@ -69,7 +67,7 @@ class User {
     if (user && (await bcrypt.compare(password, user.password))) {
       return user;
     } else {
-      throw new ExpressError('Cannot authenticate', 401);
+      throw new ExpressError("Cannot authenticate", 401);
     }
   }
 
@@ -81,11 +79,11 @@ class User {
 
   static async getAll(username, password) {
     const result = await db.query(
+      //BUG 5: SELECT username, first_name, last_name, email, phone FROM users ORDER BY username`
+      //BUGFIX: removed email and phone
       `SELECT username,
                 first_name,
-                last_name,
-                email,
-                phone
+                last_name
             FROM users 
             ORDER BY username`
     );
@@ -113,7 +111,10 @@ class User {
     const user = result.rows[0];
 
     if (!user) {
-      new ExpressError('No such user', 404);
+      //BUG 6: missing "throw" keyword
+      //new ExpressError("No such user", 404);
+      //BUGFIX:
+      throw new ExpressError("No such user", 404);
     }
 
     return user;
@@ -129,9 +130,9 @@ class User {
 
   static async update(username, data) {
     let { query, values } = sqlForPartialUpdate(
-      'users',
+      "users",
       data,
-      'username',
+      "username",
       username
     );
 
@@ -139,7 +140,7 @@ class User {
     const user = result.rows[0];
 
     if (!user) {
-      throw new ExpressError('No such user', 404);
+      throw new ExpressError("No such user", 404);
     }
 
     return user;
@@ -153,13 +154,15 @@ class User {
 
   static async delete(username) {
     const result = await db.query(
-      'DELETE FROM users WHERE username = $1 RETURNING username',
+      "DELETE FROM users WHERE username = $1 RETURNING username",
       [username]
     );
     const user = result.rows[0];
+    console.log(`result: ${result.rows}`);
+    console.log(`user: ${result.rows[0]}`);
 
     if (!user) {
-      throw new ExpressError('No such user', 404);
+      throw new ExpressError("No such user", 404);
     }
 
     return true;
