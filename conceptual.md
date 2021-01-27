@@ -57,7 +57,7 @@ Answer the following questions below:
 
 **10.  What is the value of using JSONSchema for validation?**
 
-Server-side validation of data is necessary, because incomplete or corrupt data can cause error down the line. It also makes it easier to display helpful error messages to the user, and prevents extra db operations. 
+* Server-side validation of data is necessary, because incomplete or corrupt data can cause error down the line. It also makes it easier to display helpful error messages to the user, and prevents extra db operations. 
 
 * there are 3 main reasons for using this tool: 
 	* to make bad user input fail fast without bad data reaching db
@@ -66,7 +66,36 @@ Server-side validation of data is necessary, because incomplete or corrupt data 
 
 **11. What are some ways to decide which code to test?**
 
-- What are some differences between Web Sockets and HTTP?
+* For unit tests, find the smallest unit of testable code 
+* Make sure to test error handling and test against invalid input
+* Think of edge cases
+
+
+**12. What are some differences between Web Sockets and HTTP?**
+
+* Web sockets and HTTP are both communication protocols used in client-server communication. 
+	* HTTP: 
+		* is unidirectional (client sends request, server sends response
+		* stateless (no information about session retained by server)
+	* Web sockets: 
+		* bidirectional	 
+		* stateful - meaning the connection between server and client is kept alive until terminated by one of the parties
+		* main use case: JS applications that run in the web browser and need to continuously receive real-time data from a server (e.g. games)
 
 **12. Did you prefer using Flask over Express? Why or why not (there is no right 
   answer here --- we want to see how you think about technology)?**
+  
+  I liked learning both frameworks. 
+  
+Flask pros: 
+
+* I prefer Python to JS. Python is quicker to point out errors, whereas JS often ignores issues, which can lead to errors down the line. I also prefer Python because it is less verbose than JS and I prefer list and dictionary compherensions to JS methods, which I often find more arbitrary and less logical. 
+* I also felt that Flask required less configuration "set-up", but this could be subjective.
+* Easy message flashing
+
+Express pros: 
+
+* easier to build JSON-only APIs, no need to serialize response data
+* npm: managing virtual environments is easier and more intuitive using node, relative to venv in Flask
+  
+ What I particularly liked about Express is learning a new way of authenticating users via JWT and using middleware. I prefer this convention over implementing auth via cookies, as was done in Flask (although I am aware that JWTs can also be used with Flask, it was just not the approach we were taught).  
